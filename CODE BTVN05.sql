@@ -1,19 +1,48 @@
-create database wallet;
+usersCREATE DATABASE wallet_system;
+USE wallet_system;
 
-use wallet;
-
-create table personWallet(
-personId int primary key ,
-remain decimal(10,2) not null check (remain >=0),
-personPass varchar(255)  not null ,
-personName nvarchar(50) not null
+-- 1. USERS (giả lập)
+CREATE TABLE users (
+    user_id INT PRIMARY KEY,
+    user_name NVARCHAR(100) NOT NULL
 );
-create table payment(
-paymentId  int auto_increment primary key,
-personId int not null,
-paymentDate datetime default current_timestamp,
-paymentValue decimal(10,2) not null check (paymentValue > 0),
-constraint fk_payment_person
-foreign key (personId) references personWallet(personId)
 
+-- 2. WALLETS (mỗi user 1 ví)
+CREATE TABLE wallets (
+    wallet_id INT AUTO_INCREMENT PRIMARY KEY,
+    
+    user_id INT NOT NULL UNIQUE,  -- mỗi user chỉ có 1 ví
+    
+    balance DECIMAL(15,2) NOT NULL DEFAULT 0 
+        CHECK (balance >= 0),  -- không âm
+    
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT fk_wallet_user
+    FOREIGN KEY (user_id)
+    REFERENCES users(user_id)
+    
+);
+
+-- 3. TRANSACTIONS (lịch sử biến động)
+CREATE TABLE transactions (
+    transaction_id INT AUTO_INCREMENT PRIMARY KEY,
+    
+    wallet_id INT NOT NULL,
+    
+    transaction_type VARCHAR(20) NOT NULL 
+        CHECK (transaction_type IN ('DEPOSIT', 'WITHDRAW', 'PAYMENT')),
+    
+    amount DECIMAL(15,2) NOT NULL 
+        CHECK (amount > 0),
+    
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING'
+        CHECK (status IN ('PENDING', 'SUCCESS', 'FAILED')),
+    
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT fk_tx_wallet
+    FOREIGN KEY (wallet_id)
+    REFERENCES wallets(wallet_id)
+    
 );
