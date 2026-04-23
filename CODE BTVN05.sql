@@ -46,3 +46,8 @@ CREATE TABLE transactions (
     REFERENCES wallets(wallet_id)
     
 );
+
+-- Sẽ có 3 kịch bản xảy ra :
+-- Không nhập tên
+-- Giao dịch âm
+-- Thời gian không đúng chính xác
